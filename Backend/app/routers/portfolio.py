@@ -1,8 +1,11 @@
-from fastapi import APIRouter
-from ..models.portfolio import Portfolio
+# app/routes/portfolio_routes.py
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from app.models.portfolio import PortfolioAnalytics
+from app.models.database import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/portfolio", tags=["Portfolio"])
 
-@router.get("/")
-def get_portfolios():
-    return [{"id": 1, "name": "Test Portfolio", "assets": ["AssetA", "AssetB"]}]
+@router.get("/", response_model=list[dict])
+def get_portfolio_summary(db: Session = Depends(get_db)):
+    return db.query(PortfolioAnalytics).all()
